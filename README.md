@@ -1,0 +1,2 @@
+# MinecraftMotionCalculator
+ calculate motion value.
