@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<script src="script.js"></script>
+		<style type="text/css">
+		.wrapper {
+			max-width: 800px;
+			position: relative;
+			margin: auto;
+		}
+		
+		.steps {
+			border: solid lightgray 10px;
+			border-radius: 10px;
+			background-color: lightgray;
+			margin: 3em 0em;
+			padding: 1em;
+		}
+		
+		h2 {
+			margin-top: 0px;
+		}
+		
+		#hide {
+			text-decoration: none;
+			color: dimgray;
+		}
+		
+		td:nth-child(2n+1) {
+			text-align: right;
+		}
+		
+		.bad {
+			border-color: lightpink;
+			background-color: lightpink;
+		}
+		
+		.good {
+			border-color: lightgreen;
+			background-color: lightgreen;
+		}
+		
+		input {
+			max-width: calc(100%);
+		}
+		
+		#command {
+			max-width: calc(100% - 7em);
+		}
+		
+		button {
+			width: 4em;
+		}
+		
+		.err:empty {
+			display: none;
+		}
+		
+		.err {
+			color: red;
+			margin-bottom: 0px;
+		}
+		</style>
+		<meta charset="utf-8">
+	</head>
+
+	<body onload="init()">
+		<div class="wrapper">
+			<div id="step1" class="steps">
+				<h2>1. 엔티티의 종류를 선택하세요.</h2>
+				<p>
+				</p>
+				<select id="entities" onchange="changeEntity();"></select>
+				<p class="err"></p>
+			</div>
+			
+			
+			<div id="step2" class="steps">
+				<h2>2. 엔티티가 소환될 좌표를 입력하세요.</h2>
+				<p>
+					마인크래프트에서 F3+C를 눌렀을 때 나오는
+					<blockquote>/execute in minecraft:overworld run tp @s (x좌표) (y좌표) (z좌표) (yaw) (pitch)</blockquote>
+					형식의 메세지 또는
+					<blockquote>(x좌표) (y좌표) (z좌표)</blockquote>
+					로 입력하시면 됩니다.
+				</p>
+				<input id="summonpoint" type="text" size="70" maxlength="150" placeholder="x좌표 y좌표 z좌표" value="" onchange="changeSummonPoint();">
+				<p class="err"></p>
+			</div>
+			
+			
+			<div id="step3" class="steps">
+				<h2>3. 엔티티가 도착할 좌표를 입력하세요.</h2>
+				<p>
+					2번 내용과 같이 입력하시면 됩니다.
+				</p>
+				<input id="destination" type="text" size="70" maxlength="150" placeholder="x좌표 y좌표 z좌표" value="" onchange="changeDestination();">
+				<p class="err"></p>
+			</div>
+			
+			
+			<div id="step4" class="steps">
+				<h2>4. 날아가는데 걸리는 시간을 입력하세요.</h2>
+				<p>
+					시간은 틱단위로 계산됩니다. (1초 = 20틱)
+				</p>
+				<input id="time" type="text" size="20" maxlength="20" placeholder="날아가는 시간" value="" onchange="changeTimeToArrive();">
+				<p class="err"></p>
+			</div>
+			
+			
+			<div id="step5" class="steps">
+				<h2>5. 세부적인 내용을 수정할 수 있습니다.</h2>
+				<p>
+					딱히 수정할 필요는 없습니다.
+				</p>
+				<a id="hide" href="#@" onclick="if(detail.style.display=='none') {detail.style.display='';hide.innerText='▼접기'} else {detail.style.display='none';hide.innerText='▶펼치기'} return false;">▶펼치기</a>
+				<div id="detail" style="display: none;">
+					<table border="0"><tbody>
+						<tr>
+							<td>summon x</td> <td><input id="x" type="text" size="5" maxlength="12" value="" onchange="changeDetails();"></td>
+							<td>y</td> <td><input id="y" type="text" size="5" maxlength="12" value="" onchange="changeDetails();"></td>
+							<td>z</td> <td><input id="z" type="text" size="5" maxlength="12" value="" onchange="changeDetails();"></td>
+						</tr>
+						<tr>
+							<td>delta x</td> <td><input id="dx" type="text" size="5" maxlength="12" value="" onchange="changeDetails();"></td>
+							<td>y</td> <td><input id="dy" type="text" size="5" maxlength="12" value="" onchange="changeDetails();"></td>
+							<td>z</td> <td><input id="dz" type="text" size="5" maxlength="12" value="" onchange="changeDetails();"></td>
+						</tr>
+						<tr>
+							<td>gravity</td> <td><input id="gravity" type="text" size="5" maxlength="12" value="" onchange="changeDetails();"></td>
+							<td>vertical drag</td> <td><input id="drag_vertical" type="text" size="5" maxlength="12" value="" onchange="changeDetails();"></td>
+							<td>horizontal drag</td> <td><input id="drag_horizontal" type="text" size="5" maxlength="12" value="" onchange="changeDetails();"></td>
+						</tr>
+						<tr>
+							<td>entity</td> <td><input id="entity" type="text" size="5" maxlength="12" value="" onchange="changeDetails();"></td>
+							<td>nbt</td> <td><input id="nbt" type="text" size="5" maxlength="12" value="" onchange="changeDetails();"></td>
+							<td>additional nbt</td> <td><input id="nbt2" type="text" size="5" maxlength="12" value="" onchange="changeDetails();"></td>
+						</tr>
+					</tbody></table>
+				</div>
+				<p class="err"></p>
+			</div>
+			
+			
+			<div id="step6" class="steps">
+				<h2>6. 끝입니다. 명령어를 사용해보세요.</h2>
+				<p>
+				</p>
+				<button width="50%" onclick="calculate();">계산</button>
+				<input id="command" type="text" size="100%" placeholder="위의 내용을 완성시킨 뒤 계산 버튼을 눌러주세요." value="">
+				<p class="err"></p>
+			</div>
+		</div>
+	</body>
+</html>
